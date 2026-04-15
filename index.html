@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>John Shackles | LLM Workflow Designer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0a1220;
+      --bg-alt: #111827;
+      --card: #111827;
+      --accent: #3a7bff;
+      --accent-soft: rgba(58, 123, 255, 0.12);
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --border: #1f2933;
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.45);
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-pill: 999px;
+      --max-width: 1080px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+      background: radial-gradient(circle at top, #111827 0, #020617 55%, #000 100%);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+      backdrop-filter: blur(16px);
+      background: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.7));
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .nav {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0.9rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .avatar-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ffffff, #3a7bff);
+      box-shadow: 0 0 18px rgba(58, 123, 255, 0.9);
+    }
+
+    .nav-name {
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      color: #e5e7eb;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.2rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      position: relative;
+      padding-bottom: 2px;
+    }
+
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      transition: width 0.2s ease;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    main {
+      flex: 1;
+    }
+
+    .section {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+    }
+
+    /* Hero */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2.2fr);
+      gap: 2.5rem;
+      padding-top: 2.5rem;
+      padding-bottom: 1.5rem;
+      align-items: center;
+    }
+
+    .hero-title {
+      font-size: clamp(2.1rem, 3vw, 2.7rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-bottom: 0.75rem;
+    }
+
+    .hero-subtitle {
+      color: var(--muted);
+      font-size: 0.98rem;
+      max-width: 34rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .badge {
+      font-size: 0.78rem;
+      padding: 0.35rem 0.8rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      color: #e5e7eb;
+      background: radial-gradient(circle at top left, rgba(148, 163, 184, 0.18), rgba(15, 23, 42, 0.9));
+    }
+
+    .badge-accent {
+      border-color: rgba(58, 123, 255, 0.7);
+      background: radial-gradient(circle at top left, rgba(58, 123, 255, 0.25), rgba(15, 23, 42, 0.95));
+      color: #e5edff;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--radius-pill);
+      font-size: 0.9rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease, border-color 0.1s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3a7bff, #6366f1);
+      color: white;
+      box-shadow: 0 14px 30px rgba(37, 99, 235, 0.45);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 40px rgba(37, 99, 235, 0.6);
+    }
+
+    .btn-ghost {
+      border-color: rgba(148, 163, 184, 0.5);
+      color: #e5e7eb;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(30, 64, 175, 0.35);
+      border-color: rgba(129, 140, 248, 0.8);
+    }
+
+    .hero-card {
+      background: radial-gradient(circle at top, rgba(37, 99, 235, 0.18), rgba(15, 23, 42, 0.98));
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.4rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .hero-card-title {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #9ca3af;
+      margin-bottom: 0.7rem;
+    }
+
+    .hero-card-main {
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero-card-main strong {
+      color: #e5e7eb;
+    }
+
+    .hero-card-list {
+      list-style: none;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .hero-card-list li {
+      margin-bottom: 0.35rem;
+    }
+
+    /* Section headings */
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 1.2rem;
+    }
+
+    /* About */
+    .about {
+      background: radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), rgba(15, 23, 42, 0.98));
+      border-radius: var(--radius-lg);
+      padding: 1.6rem 1.5rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: var(--shadow-soft);
+      font-size: 0.95rem;
+      color: #e5e7eb;
+    }
+
+    .about p + p {
+      margin-top: 0.7rem;
+    }
+
+    /* Skills */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.2rem;
+    }
+
+    .skill-card {
+      background: rgba(15, 23, 42, 0.95);
+      border-radius: var(--radius-md);
+      padding: 1rem 1rem;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+    }
+
+    .skill-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: #e5e7eb;
+    }
+
+    .skill-list {
+      list-style: none;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .skill-list li {
+      margin-bottom: 0.25rem;
+    }
+
+    /* Projects */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.4fr);
+      gap: 1.4rem;
+    }
+
+    .project-card {
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: var(--radius-lg);
+      padding: 1.2rem 1.1rem;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.7);
+    }
+
+    .project-title {
+      font-size: 0.98rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .project-tech {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .project-body {
+      font-size: 0.88rem;
+      color: #e5e7eb;
+      margin-bottom: 0.6rem;
+    }
+
+    .project-subtitle {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #9ca3af;
+      margin-top: 0.4rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .project-list {
+      list-style: disc;
+      padding-left: 1.1rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .project-list li {
+      margin-bottom: 0.2rem;
+    }
+
+    /* Experience */
+    .experience-list {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .exp-card {
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: var(--radius-md);
+      padding: 1rem 1rem;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+    }
+
+    .exp-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.3rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .exp-role {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .exp-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .exp-list {
+      list-style: disc;
+      padding-left: 1.1rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+
+    .exp-list li {
+      margin-bottom: 0.2rem;
+    }
+
+    /* Education */
+    .edu-list {
+      list-style: none;
+      font-size: 0.88rem;
+      color: #e5e7eb;
+    }
+
+    .edu-list li {
+      margin-bottom: 0.3rem;
+    }
+
+    .edu-muted {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    /* Contact */
+    .contact-card {
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: var(--radius-lg);
+      padding: 1.3rem 1.2rem;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
+      gap: 1.2rem;
+      align-items: center;
+    }
+
+    .contact-text {
+      font-size: 0.9rem;
+      color: #e5e7eb;
+    }
+
+    .contact-grid {
+      display: grid;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .contact-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #9ca3af;
+    }
+
+    footer {
+      border-top: 1px solid rgba(31, 41, 55, 0.9);
+      padding: 1rem 1.5rem 1.5rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .hero-card {
+        order: -1;
+      }
+      .skills-grid,
+      .projects-grid,
+      .contact-card {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .nav {
+        padding-inline: 1rem;
+      }
+      .section {
+        padding-inline: 1rem;
+      }
+      .nav-links {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="nav">
+      <div class="nav-left">
+        <div class="avatar-dot"></div>
+        <div class="nav-name">JOHN SHACKLES</div>
+      </div>
+      <nav class="nav-links">
+        <a href="#projects">Projects</a>
+        <a href="#skills">Skills</a>
+        <a href="#experience">Experience</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="section hero" id="top">
+      <div>
+        <h1 class="hero-title">LLM Workflow Designer & Automation Engineer</h1>
+        <p class="hero-subtitle">
+          I design AI-powered workflows that connect large language models with real enterprise systems—
+          from RAG pipelines and multi-agent flows to automation that actually reduces operational drag.
+        </p>
+        <div class="hero-badges">
+          <span class="badge-accent">LLM Workflow Design</span>
+          <span class="badge">RAG Pipelines</span>
+          <span class="badge">Azure OpenAI</span>
+          <span class="badge">PowerShell Automation</span>
+        </div>
+        <div class="hero-actions">
+          <a href="#projects" class="btn btn-primary">View AI Projects</a>
+          <a href="#contact" class="btn btn-ghost">Get in touch</a>
+        </div>
+      </div>
+      <aside class="hero-card">
+        <div class="hero-card-title">Current Focus</div>
+        <div class="hero-card-main">
+          Building <strong>LLM-powered tools</strong> that sit on top of
+          <strong>Microsoft 365, Azure/Entra, and automation workflows</strong> to make IT operations faster,
+          safer, and less manual.
+        </div>
+        <ul class="hero-card-list">
+          <li>Designing RAG-based troubleshooting assistants</li>
+          <li>Generating onboarding workflows with LLMs + automation</li>
+          <li>Analyzing Conditional Access policies with AI reasoning</li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- About -->
+    <section class="section">
+      <h2 class="section-title">About</h2>
+      <div class="about">
+        <p>
+          I’m an automation-driven IT professional transitioning into <strong>LLM Workflow Design</strong>, with a
+          strong foundation in cloud identity, scripting, and enterprise systems. Over the past six years, I’ve built
+          automation that reduced manual workload by 45%, supported large Microsoft 365 and Azure environments, and
+          designed scalable processes used across hundreds of clients and thousands of users.
+        </p>
+        <p>
+          Now, I’m applying that same mindset to AI—designing workflows where LLMs don’t just answer questions,
+          but actually <strong>drive real actions</strong> in production environments.
+        </p>
+      </div>
+    </section>
+
+    <!-- Skills -->
+    <section class="section" id="skills">
+      <h2 class="section-title">Skills</h2>
+      <div class="skills-grid">
+        <div class="skill-card">
+          <div class="skill-title">AI & LLM Engineering</div>
+          <ul class="skill-list">
+            <li>LLM Workflow Design</li>
+            <li>Prompt Engineering</li>
+            <li>Retrieval-Augmented Generation (RAG)</li>
+            <li>Multi-Agent Orchestration</li>
+            <li>JSON Schema & Structured Output</li>
+            <li>Azure OpenAI / OpenAI API</li>
+          </ul>
+        </div>
+        <div class="skill-card">
+          <div class="skill-title">Automation & Scripting</div>
+          <ul class="skill-list">
+            <li>PowerShell (advanced)</li>
+            <li>Python (in progress)</li>
+            <li>Azure Automation</li>
+            <li>Power Automate</li>
+            <li>GitHub Version Control</li>
+          </ul>
+        </div>
+        <div class="skill-card">
+          <div class="skill-title">Cloud & Identity</div>
+          <ul class="skill-list">
+            <li>Azure AD / Entra ID</li>
+            <li>Conditional Access</li>
+            <li>MFA / SSO / SAML / JIT</li>
+            <li>Intune & Endpoint Compliance</li>
+          </ul>
+        </div>
+        <div class="skill-card">
+          <div class="skill-title">Systems & Infrastructure</div>
+          <ul class="skill-list">
+            <li>Windows Server 2016/2019/2022</li>
+            <li>GPO Design & Deployment</li>
+            <li>Networking (DHCP/DNS/LAN/WLAN)</li>
+            <li>Firewall & Switch Configuration</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects -->
+    <section class="section" id="projects">
+      <h2 class="section-title">AI Projects</h2>
+      <div class="projects-grid">
+        <article class="project-card">
+          <h3 class="project-title">AI-Powered Troubleshooting Assistant (RAG)</h3>
+          <div class="project-tech">Python • LangChain • Azure OpenAI • Vector DB • FastAPI</div>
+          <p class="project-body">
+            A retrieval-augmented assistant trained on internal documentation that diagnoses issues, proposes solutions,
+            and generates remediation steps for Microsoft 365 and Windows environments.
+          </p>
+          <div class="project-subtitle">Highlights</div>
+          <ul class="project-list">
+            <li>Custom chunking + embeddings pipeline for IT docs and KBs</li>
+            <li>Hallucination-reduction scoring and confidence indicators</li>
+            <li>Integration with PowerShell automation for real remediation</li>
+            <li>Deployed as an internal web app for support teams</li>
+          </ul>
+        </article>
+
+        <article class="project-card">
+          <h3 class="project-title">Automated Onboarding Planner (LLM + Automation)</h3>
+          <div class="project-tech">Azure OpenAI • PowerShell • Power Automate</div>
+          <p class="project-body">
+            An LLM-driven workflow generator that creates onboarding and offboarding plans based on job role,
+            department, and access requirements, then hands execution off to automation.
+          </p>
+          <div class="project-subtitle">Highlights</div>
+          <ul class="project-list">
+            <li>LLM generates structured JSON workflows for provisioning</li>
+            <li>PowerShell scripts execute account, group, and device setup</li>
+            <li>Power Automate handles approvals and notifications</li>
+            <li>Reduces onboarding time and manual steps significantly</li>
+          </ul>
+        </article>
+
+        <article class="project-card">
+          <h3 class="project-title">Conditional Access Policy Analyzer</h3>
+          <div class="project-tech">Azure OpenAI • Python • JSON Policy Parsing</div>
+          <p class="project-body">
+            An LLM tool that evaluates Conditional Access and Intune policies, identifies risks, and recommends
+            improvements in plain language for security and IT teams.
+          </p>
+          <div class="project-subtitle">Highlights</div>
+          <ul class="project-list">
+            <li>Parses policy JSON and feeds structured context into the LLM</li>
+            <li>Multi-step reasoning chain for risk scoring and recommendations</li>
+            <li>Guardrails to prevent unsafe or misleading suggestions</li>
+          </ul>
+        </article>
+
+        <article class="project-card">
+          <h3 class="project-title">Multi-Agent Documentation Generator</h3>
+          <div class="project-tech">LangChain / LangGraph • Azure OpenAI</div>
+          <p class="project-body">
+            A multi-agent system that converts raw technical details into polished documentation, with separate agents
+            for extraction, writing, validation, and formatting.
+          </p>
+          <div class="project-subtitle">Highlights</div>
+          <ul class="project-list">
+            <li>Extractor agent pulls key details from tickets and logs</li>
+            <li>Writer agent drafts user-facing or internal documentation</li>
+            <li>Validator agent checks for consistency and missing steps</li>
+            <li>Formatter agent outputs Markdown or HTML for portals</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- Experience -->
+    <section class="section" id="experience">
+      <h2 class="section-title">Experience</h2>
+      <div class="experience-list">
+        <article class="exp-card">
+          <div class="exp-header">
+            <div class="exp-role">System Administrator III — Humana</div>
+            <div class="exp-meta">Remote • Sept 2024 – Present</div>
+          </div>
+          <ul class="exp-list">
+            <li>Senior escalation lead for Microsoft 365, Azure/Entra, and Windows environments.</li>
+            <li>Developed PowerShell automation for M365 and Windows troubleshooting.</li>
+            <li>Designed and troubleshot Conditional Access policies to improve security posture.</li>
+            <li>Supported C-Suite leadership and guided Level 2 technicians.</li>
+            <li>Resolved company-wide Microsoft service outages with rapid root-cause analysis.</li>
+          </ul>
+        </article>
+
+        <article class="exp-card">
+          <div class="exp-header">
+            <div class="exp-role">System Administrator II — Integris</div>
+            <div class="exp-meta">Remote • Nov 2023 – Sept 2024</div>
+          </div>
+          <ul class="exp-list">
+            <li>Automated onboarding/offboarding workflows, reducing manual workload by 45%.</li>
+            <li>Built PowerShell scripts for provisioning, deprovisioning, and software deployment.</li>
+            <li>Designed and deployed GPOs for configuration and compliance.</li>
+            <li>Performed server migrations and network infrastructure deployments.</li>
+            <li>Conducted documentation audits to improve operational consistency.</li>
+          </ul>
+        </article>
+
+        <article class="exp-card">
+          <div class="exp-header">
+            <div class="exp-role">IT Project Engineer — Project44</div>
+            <div class="exp-meta">Remote • May 2023 – Oct 2023</div>
+          </div>
+          <ul class="exp-list">
+            <li>Built internal GitHub repository of PowerShell scripts for Azure administration.</li>
+            <li>Managed SSO, SAML/JIT provisioning, and enterprise application integrations.</li>
+            <li>Administered Google Workspace users, groups, and applications.</li>
+            <li>Implemented compliance and configuration policies across Azure environments.</li>
+          </ul>
+        </article>
+
+        <article class="exp-card">
+          <div class="exp-header">
+            <div class="exp-role">IT Support Engineer — Project44</div>
+            <div class="exp-meta">Hybrid • May 2022 – May 2023</div>
+          </div>
+          <ul class="exp-list">
+            <li>Sole onsite IT lead for Austin office, supporting thousands of internal users.</li>
+            <li>Managed Azure Endpoint policies to maintain device compliance.</li>
+            <li>Deployed Windows, Mac, iOS, Linux, and VM workstations via Intune.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- Education -->
+    <section class="section">
+      <h2 class="section-title">Education & Certifications</h2>
+      <ul class="edu-list">
+        <li>
+          <strong>Associate of Applied Science</strong> — Austin Community College
+        </li>
+        <li>
+          <strong>Bachelor of Science</strong> — Texas State University
+        </li>
+        <li class="edu-muted">
+          Certifications: AZ-900, MS-100, MS-900, CompTIA A+
+        </li>
+      </ul>
+    </section>
+
+    <!-- Contact -->
+    <section class="section" id="contact">
+      <h2 class="section-title">Contact</h2>
+      <div class="contact-card">
+        <div class="contact-text">
+          I’m actively building toward roles in <strong>LLM Workflow Design, AI Automation, and AI-powered IT tooling</strong>.
+          If you’re working on AI in enterprise environments—or want to explore what that could look like—I’d love to talk.
+        </div>
+        <div class="contact-grid">
+          <div>
+            <div class="contact-label">Email</div>
+            <div>john.shackles@gmail.com</div>
+          </div>
+          <div>
+            <div class="contact-label">Location</div>
+            <div>Seguin / New Braunfels, TX (Remote-friendly)</div>
+          </div>
+          <div>
+            <div class="contact-label">LinkedIn</div>
+            <div><span>linkedin.com/in/your-profile</span></div>
+          </div>
+          <div>
+            <div class="contact-label">GitHub</div>
+            <div><span>github.com/your-handle</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © <span id="year"></span> John Shackles • LLM Workflow Designer & Automation Engineer
+  </footer>
+</div>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
