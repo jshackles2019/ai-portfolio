@@ -31,7 +31,6 @@ View the full portfolio:
 👉 Add your GitHub Pages or Netlify link here once deployed
 
 📂 Repository Structure
-Code
 ai-portfolio/
 │
 ├── projects/
@@ -50,6 +49,7 @@ ai-portfolio/
 │   └── diagrams/
 │
 └── README.md
+
 🚀 Featured AI Projects
 1. AI‑Powered Troubleshooting Assistant (RAG)
 A retrieval‑augmented assistant trained on internal documentation that diagnoses issues, proposes solutions, and generates remediation steps.
